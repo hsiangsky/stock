@@ -1,4 +1,5 @@
 from grs import TWSEOpen
+from grs import TWSENo
 from datetime import datetime, timedelta
 import pandas as pd
 import os
@@ -31,13 +32,13 @@ class Stock:
 
     def __init__(self):
         print 'Loading stock data...'
-        self.src = '/data/recover'
+        self.src = '/home/hsiangsky/stock/data/recover'
         self.file_names = os.listdir(self.src)
         self.total_stock = len(self.file_names)
         self.stock = {}
         self.count = 0
         bar = progressbar.ProgressBar(max_value=self.total_stock)
-        for self.file_name in ['9962.csv', '2618.csv']:
+        for self.file_name in self.file_names:
             self.count += 1
             bar.update(self.count)
             if not self.file_name.endswith('.csv'):
@@ -98,10 +99,15 @@ class Stock:
         else:
             raise Exception('Lack of input.')
 
-
     def get_stock_list(self):
         return [key for key in self.stock] #list
 
+    def get_TWSE_no(self):
+        return TWSENo().all_stock_no
+
+    def get_time_series(self, stk_no=None, attr=None, start='2008/01/01', end='2015/12/31'):
+        return self.stock[stk_no][attr].loc[start:end].axes[0].tolist()
+        
 
     #MA_Type: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3 (Default=SMA)
     def MA(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=5, matype=0):
@@ -133,7 +139,11 @@ class Stock:
         realstart = day_back(start, timeperiod)
         high = self.get_stock_data(stk_no, 'HighestPrice', realstart, end)
         low = self.get_stock_data(stk_no, 'LowestPrice', realstart, end)
+        if np.isnan(high).all() or np.isnan(low).all():
+            return [], [], []
         aroonup, aroondown = talib.AROON(high, low, timeperiod)
+        if np.isnan(aroonup).all() or np.isnan(aroondown).all():
+            return [], [], []
         aroonosc = talib.SUB(aroonup, aroondown)
         return aroonup[timeperiod:], aroondown[timeperiod:], aroonosc[timeperiod:]
 
@@ -171,9 +181,13 @@ class Stock:
         low = self.get_stock_data(stk_no, 'LowestPrice', realstart, end)
         close = self.get_stock_data(stk_no, 'ClosePrice', realstart, end)
         P = (high + low + 2*close)/4
+        if np.isnan(P).all():
+            return [], [], []
         E_fast = talib.EMA(P, fastperiod)
         E_slow = talib.EMA(P, slowperiod)
         dif = E_fast - E_slow
+        if np.isnan(dif).all():
+            return [], [], []
         dea = talib.EMA(dif, signalperiod)
         macd = dif - dea 
         return dif[longest_period:], dea[longest_period:], macd[longest_period:]
