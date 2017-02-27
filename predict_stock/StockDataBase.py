@@ -210,7 +210,7 @@ class Stock:
         close = self.get_stock_data(stk_no, 'ClosePrice', realstart, end)
         if np.isnan(close).all():
             return []
-        cci = talib(high, low, close, timeperiod)
+        cci = talib.CCI(high, low, close, timeperiod)
         if np.isnan(cci).all():
             return []
         else:
