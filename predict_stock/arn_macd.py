@@ -12,8 +12,8 @@ stklist = stock.get_TWSE_no()
 
 long_list = []
 short_list = []
-strong = 50
-stable = 30
+strong = 80
+stable = 8
 
 print 'Analysis ' + end_time
 bar = progressbar.ProgressBar(max_value=len(stklist))

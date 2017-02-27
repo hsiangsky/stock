@@ -32,7 +32,7 @@ class Stock:
 
     def __init__(self):
         print 'Loading stock data...'
-        self.src = '/home/hsiangsky/stock/data/recover'
+        self.src = '/data/recover'
         self.file_names = os.listdir(self.src)
         self.total_stock = len(self.file_names)
         self.stock = {}
@@ -110,19 +110,19 @@ class Stock:
         
 
     #MA_Type: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3 (Default=SMA)
-    def MA(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=5, matype=0):
+    def MA(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=5, matype=0):
         realstart = day_back(start, timeperiod)
         close = self.get_stock_data(stk_no, 'ClosePrice', realstart, end)
         return talib.MA(close, timeperiod, matype=matype)[timeperiod:] 
 
 
-    def RSI(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=14):
+    def RSI(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=14):
         realstart = day_back(start, timeperiod)
         close = self.get_stock_data(stk_no, 'ClosePrice', realstart, end)
         return talib.RSI(close, timeperiod)[timeperiod:]
 
 
-    def BIAS(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=5):
+    def BIAS(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=5):
         realstart = day_back(start, timeperiod)
         ma = self.MA(stk_no, realstart, end, timeperiod)
         close = self.get_stock_data(stk_no, 'ClosePrice', start, end)
@@ -135,7 +135,7 @@ class Stock:
         return np.array(bias)
 
 
-    def Aroon(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=14):
+    def Aroon(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=14):
         realstart = day_back(start, timeperiod)
         high = self.get_stock_data(stk_no, 'HighestPrice', realstart, end)
         low = self.get_stock_data(stk_no, 'LowestPrice', realstart, end)
@@ -148,7 +148,7 @@ class Stock:
         return aroonup[timeperiod:], aroondown[timeperiod:], aroonosc[timeperiod:]
 
 
-    def RSV(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=9):
+    def RSV(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=9):
         realstart = day_back(start, timeperiod)
         high = self.get_stock_data(stk_no, 'HighestPrice', realstart, end)
         low = self.get_stock_data(stk_no, 'LowestPrice', realstart, end)
@@ -158,7 +158,7 @@ class Stock:
         return talib.DIV(close-Min, Max-Min)[timeperiod:]
 
 
-    def KD_value(self, stk_no, start='2008/01/01', end='2015/12/31', timeperiod=9):
+    def KD_value(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=9):
         rsv = self.RSV(stk_no, start, end, timeperiod)
         k_value = []
         d_value = []
@@ -174,7 +174,7 @@ class Stock:
         return np.array(k_value), np.array(d_value)
 
 
-    def MACD(self, stk_no, start='2008/01/01', end='2015/12/31', fastperiod=12, slowperiod=26, signalperiod=9):
+    def MACD(self, stk_no, start='2008/01/01', end='2016/12/31', fastperiod=12, slowperiod=26, signalperiod=9):
         longest_period = max(fastperiod, slowperiod)+signalperiod
         realstart = day_back(start, longest_period)
         high = self.get_stock_data(stk_no, 'HighestPrice', realstart, end)
@@ -192,8 +192,16 @@ class Stock:
         macd = dif - dea 
         return dif[longest_period:], dea[longest_period:], macd[longest_period:]
 
-
-
+    def CMO(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=14):
+        realstart = day_back(start, timeperiod)
+        close = self.get_stock_data(stk_no, 'ClosePrice', realstart, end)
+        if np.isnan(close).all():
+            return []
+        cmo = talib.CMO(close, timeperiod)
+        if np.isnan(cmo).all():
+            return []
+        else:
+            return cmo[timeperiod:]
 
 
 
