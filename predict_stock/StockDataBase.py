@@ -32,7 +32,7 @@ class Stock:
 
     def __init__(self):
         print 'Loading stock data...'
-        self.src = '/data/recover'
+        self.src = '/home/hsiangsky/stock/data/recover'
         self.file_names = os.listdir(self.src)
         self.total_stock = len(self.file_names)
         self.stock = {}
@@ -203,7 +203,18 @@ class Stock:
         else:
             return cmo[timeperiod:]
 
-
+    def CCI(self, stk_no, start='2008/01/01', end='2016/12/31', timeperiod=14):
+        realstart = day_back(start, timeperiod)
+        high = self.get_stock_data(stk_no, 'HighestPrice', realstart, end)
+        low = self.get_stock_data(stk_no, 'LowestPrice', realstart, end)
+        close = self.get_stock_data(stk_no, 'ClosePrice', realstart, end)
+        if np.isnan(close).all():
+            return []
+        cci = talib.CCI(high, low, close, timeperiod)
+        if np.isnan(cci).all():
+            return []
+        else:
+            return cci[timeperiod:]
 
 
 
