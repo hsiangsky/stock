@@ -16,10 +16,10 @@ hold = {}
 money = 0
 cost = 0
 max_return = -100000
-best_window = 55
-window = 55
-best_high = 0
-best_low = 0
+best_window = 57
+window = 57
+best_high = 40
+best_low = -48
 
 bar = progressbar.ProgressBar(max_value=len(stklist))
 count = 0
