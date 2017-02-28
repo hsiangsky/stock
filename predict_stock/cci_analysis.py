@@ -24,8 +24,8 @@ best_low = 0
 bar = progressbar.ProgressBar(max_value=len(stklist))
 count = 0
 
-for high in range(80, 151, 5):
-    for low in range(-150, -79, 5):
+for high in range(210, 251, 5):
+    for low in range(-120, -109, 5):
         money = 0
         cost = 0
         count = 0
@@ -42,23 +42,22 @@ for high in range(80, 151, 5):
             if len(cci) != len(close):
                 continue
             for t in range(1, len(close)):
-                if (cci[t] > high and cci[t-1] < high) or (cci[t] > low and cci[t-1] < low):
+                if (cci[t] > low and cci[t-1] < low):
                     print 'Buy ' + str(stk_no) + ', price ' + str(close[t])
                     logfile.write('Buy ' + str(stk_no) + ', price ' + str(close[t]) + '\n')
                     hold[stk_no] += 1
                     money -= close[t]
                     cost += close[t]
 
-                if (cci[t] < high and cci[t-1] > high)and hold[stk_no] > 0:
+                if ((cci[t] > high and cci[t-1] < high) or (cci[t] < high and cci[t-1] > high)) and hold[stk_no] > 0:
                     print 'Sell ' + str(stk_no) + ', price ' + str(close[t])
                     logfile.write('Sell ' + str(stk_no) + ', price ' + str(close[t]) + '\n')
-                    hold[stk_no] += 1
                     hold[stk_no] -= 1
                     money += close[t]
 
             if hold[stk_no] != 0:
                 print 'Hold ' + str(stk_no) + ': ' + str(hold[stk_no]) + ', sell price ' + str(close[-1])
-                logfile('Hold ' + str(stk_no) + ': ' + str(hold[stk_no]) + ', sell price ' + str(close[-1]) + '\n')
+                logfile.write('Hold ' + str(stk_no) + ': ' + str(hold[stk_no]) + ', sell price ' + str(close[-1]) + '\n')
                 money += close[-1]*hold[stk_no]
 
         print 'High: ' + str(high) + '. Low: ' + str(low)
@@ -79,6 +78,6 @@ for high in range(80, 151, 5):
 print 'High: ' + str(best_high) + '. Low: ' + str(best_low)
 #print 'Total cost: ' + str(cost)
 print 'Best return: ' + str(max_return) + ' %'
-logfile.write('Best high: ' + str(best_high) + ', low: ' + str(best_low))
-logfile.write('Best reture: '+ str(max_return))
+logfile.write('Best high: ' + str(best_high) + ', low: ' + str(best_low) + '\n')
+logfile.write('Best return: '+ str(max_return))
 
